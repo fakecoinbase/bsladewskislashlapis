@@ -1,4 +1,5 @@
-// Package coinbase_test conatins tests for interacting with the coinbase API.
+// Package coinbase_test contains unit tests for interacting with the coinbase
+// API.
 package coinbase_test
 
 import (
