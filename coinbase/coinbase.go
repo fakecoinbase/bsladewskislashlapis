@@ -4,7 +4,6 @@ package coinbase
 import (
 	"encoding/csv"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,19 +11,9 @@ import (
 	"sort"
 	"strconv"
 	"time"
-)
 
-var (
-	// ErrEndOfMockData indicates that the end of the historical data used to
-	// mock the coinbase API has been reached.
-	ErrEndOfMockData = errors.New("end of mock data")
+	"github.com/bsladewski/lapis/stream"
 )
-
-// Client provides functions for interacting with the coinbase API.
-type Client interface {
-	// GetSpotPrice retrieves the exchange rate between one BTC and USD.
-	GetSpotPrice() (float64, error)
-}
 
 // A defaultClient is used to interact with the coinbase API.
 type defaultClient struct {
@@ -33,7 +22,7 @@ type defaultClient struct {
 
 // NewClient retrieves a client that can be used to interact with the coinbase
 // API.
-func NewClient() Client {
+func NewClient() stream.Stream {
 
 	return &defaultClient{
 		client: http.Client{Timeout: 15 * time.Second},
@@ -49,7 +38,7 @@ type mockClient struct {
 
 // NewMockClient retrieves a client that can be used to mock interactions with
 // the coinbaes API.
-func NewMockClient(mockDataReader io.Reader) (Client, error) {
+func NewMockClient(mockDataReader io.Reader) (stream.Stream, error) {
 
 	spotPrices, err := parseHistoricalData(mockDataReader)
 	if err != nil {
@@ -70,7 +59,7 @@ type spotPriceResponse struct {
 	Amount string `json:"amount"`
 }
 
-func (d *defaultClient) GetSpotPrice() (float64, error) {
+func (d *defaultClient) Next() (float64, error) {
 
 	// create a new GET request to coinbase spot price endpoint
 	req, err := http.NewRequest(
@@ -119,7 +108,9 @@ func (d *defaultClient) GetSpotPrice() (float64, error) {
 
 }
 
-func (m *mockClient) GetSpotPrice() (float64, error) {
+func (d *defaultClient) Close() {}
+
+func (m *mockClient) Next() (float64, error) {
 
 	// retrieve the next item of mock data and increment current index into mock
 	// data
@@ -130,8 +121,12 @@ func (m *mockClient) GetSpotPrice() (float64, error) {
 	}
 
 	// return an error indicating that we have reached the end of mock data
-	return 0.0, ErrEndOfMockData
+	return 0.0, stream.ErrEndOfStream
 
+}
+
+func (m *mockClient) Close() {
+	m.spotPrices = nil
 }
 
 // GetHistoricalData retrieves historical hourly coinbase data for bitcoin

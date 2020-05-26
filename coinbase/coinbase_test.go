@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/bsladewski/lapis/coinbase"
+	"github.com/bsladewski/lapis/stream"
 )
 
 // TestGetSpotPrice tests retrieving a spot price from the coinbase API.
@@ -16,7 +17,7 @@ func TestGetSpotPrice(t *testing.T) {
 	client := coinbase.NewClient()
 
 	// retrieve spot price
-	rate, err := client.GetSpotPrice()
+	rate, err := client.Next()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,8 +65,8 @@ func TestGetMockSpotPrice(t *testing.T) {
 
 	for {
 
-		rate, err := client.GetSpotPrice()
-		if err == coinbase.ErrEndOfMockData {
+		rate, err := client.Next()
+		if err == stream.ErrEndOfStream {
 			break
 		}
 

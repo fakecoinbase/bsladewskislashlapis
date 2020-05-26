@@ -1,3 +1,5 @@
+github.com/bsladewski/gollections v0.0.0-20191008223943-9dca32fe2077 h1:r0TgBV7I58Z9F8tfMHso9xDpsaRq27iayFhQLCXI94o=
+github.com/bsladewski/gollections v0.0.0-20191008223943-9dca32fe2077/go.mod h1:Ro6XuiZFQipUhXGFcUHLdjwYUT8yEecbhVgT2r5BzfM=
 github.com/denisenkom/go-mssqldb v0.0.0-20191124224453-732737034ffd h1:83Wprp6ROGeiHFAP8WJdI2RoxALQYgdllERc3N5N2DM=
 github.com/denisenkom/go-mssqldb v0.0.0-20191124224453-732737034ffd/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 h1:Yzb9+7DPaBjB8zlTR87/ElzFsnQfuHnVUVqpZZIcV5Y=
