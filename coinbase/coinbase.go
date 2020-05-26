@@ -9,7 +9,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"sort"
 	"strconv"
 	"time"
@@ -50,82 +49,11 @@ type mockClient struct {
 
 // NewMockClient retrieves a client that can be used to mock interactions with
 // the coinbaes API.
-func NewMockClient() (Client, error) {
+func NewMockClient(mockDataReader io.Reader) (Client, error) {
 
-	// open file containing mock data
-	mockDataFile, err := os.Open("mock_data.csv")
+	spotPrices, err := parseHistoricalData(mockDataReader)
 	if err != nil {
-		return nil, fmt.Errorf("open mock data file, err: %v", err)
-	}
-	defer mockDataFile.Close()
-
-	// read mock data as comma separated values
-	reader := csv.NewReader(mockDataFile)
-
-	// define type for storing close prices associated with a specific timestamp
-	type priceDatum struct {
-		Timestamp time.Time
-		Price     float64
-	}
-
-	priceData := []priceDatum{}
-
-	// headers indicates that the record we are currently looking at is a row of
-	// headers and not data
-	headers := true
-
-	// loop until we are finished reading the csv data
-	for {
-
-		// read the next row
-		record, err := reader.Read()
-
-		// if we are looking at headers, skip the current row and mark that
-		// headers have already been read
-		if headers {
-			headers = false
-			continue
-		}
-
-		if err == io.EOF {
-			// if we are at the end of the file, the file has been successfully
-			// read
-			break
-		} else if err != nil {
-			// if any error other than an EOF is encountered, return the error
-			// as we were unable to parse the csv file
-			return nil, fmt.Errorf("reading mock data, err: %v", err)
-		}
-
-		// parse the timestamp from the csv data; as the data starts with the
-		// newest record we will need to sort by timestamp ascending when the
-		// file has been read
-		timestamp, err := time.Parse("2006-01-02 03-PM", record[0])
-		if err != nil {
-			return nil, fmt.Errorf("parsing timestamp, err: %v", err)
-		}
-
-		// parse the close price from csv data; the close price will represent
-		// the spot price for this index
-		price, err := strconv.ParseFloat(record[5], 64)
-		if err != nil {
-			return nil, fmt.Errorf("parsing price, err: %v", err)
-		}
-
-		// add the timestamp and close price to price data
-		priceData = append(priceData, priceDatum{timestamp, price})
-
-	}
-
-	// sort price data by timestamp ascending
-	sort.Slice(priceData, func(i, j int) bool {
-		return priceData[i].Timestamp.Before(priceData[j].Timestamp)
-	})
-
-	// build ordered list of price data
-	spotPrices := []float64{}
-	for _, priceDatum := range priceData {
-		spotPrices = append(spotPrices, priceDatum.Price)
+		return nil, fmt.Errorf("parse mock data file, err: %v", err)
 	}
 
 	// return the mock client starting at index zero of historical price data
@@ -203,5 +131,107 @@ func (m *mockClient) GetSpotPrice() (float64, error) {
 
 	// return an error indicating that we have reached the end of mock data
 	return 0.0, ErrEndOfMockData
+
+}
+
+// GetHistoricalData retrieves historical hourly coinbase data for bitcoin
+// prices.
+func GetHistoricalData() ([]float64, error) {
+
+	// create a new GET request for historical coinbase spot prices
+	req, err := http.NewRequest(
+		"GET",
+		"http://www.cryptodatadownload.com/cdd/Coinbase_BTCUSD_1h.csv",
+		nil)
+	if err != nil {
+		return nil, fmt.Errorf("get historical data, err: %v", err)
+	}
+
+	// create client for executing requests
+	client := http.Client{Timeout: 30 * time.Second}
+
+	// execute the request
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	spotPrices, err := parseHistoricalData(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("parse historical data, err: %v", err)
+	}
+
+	return spotPrices, nil
+
+}
+
+func parseHistoricalData(r io.Reader) ([]float64, error) {
+
+	// define type for storing close prices associated with a specific timestamp
+	type priceDatum struct {
+		Timestamp time.Time
+		Price     float64
+	}
+
+	// open csv reader
+	reader := csv.NewReader(r)
+	reader.FieldsPerRecord = -1
+
+	priceData := []priceDatum{}
+
+	// loop until we are finished reading the csv data
+	for {
+
+		// read the next row
+		record, err := reader.Read()
+
+		if err == io.EOF {
+			// if we are at the end of the file, the file has been successfully
+			// read
+			break
+		} else if err != nil {
+			// if any error other than an EOF is encountered, return the error
+			// as we were unable to parse the csv file
+			return nil, fmt.Errorf("reading mock data, err: %v", err)
+		}
+
+		// if we are not looking at a row of data, skip the row
+		if record[1] != "BTCUSD" {
+			continue
+		}
+
+		// parse the timestamp from the csv data; as the data starts with the
+		// newest record we will need to sort by timestamp ascending when the
+		// file has been read
+		timestamp, err := time.Parse("2006-01-02 03-PM", record[0])
+		if err != nil {
+			return nil, fmt.Errorf("parsing timestamp, err: %v", err)
+		}
+
+		// parse the close price from csv data; the close price will represent
+		// the spot price for this index
+		price, err := strconv.ParseFloat(record[5], 64)
+		if err != nil {
+			return nil, fmt.Errorf("parsing price, err: %v", err)
+		}
+
+		// add the timestamp and close price to price data
+		priceData = append(priceData, priceDatum{timestamp, price})
+
+	}
+
+	// sort price data by timestamp ascending
+	sort.Slice(priceData, func(i, j int) bool {
+		return priceData[i].Timestamp.Before(priceData[j].Timestamp)
+	})
+
+	// build ordered list of price data
+	spotPrices := []float64{}
+	for _, priceDatum := range priceData {
+		spotPrices = append(spotPrices, priceDatum.Price)
+	}
+
+	return spotPrices, nil
 
 }

@@ -3,6 +3,7 @@
 package coinbase_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/bsladewski/lapis/coinbase"
@@ -31,11 +32,32 @@ func TestGetSpotPrice(t *testing.T) {
 
 }
 
-// TestGetMockSpotPrice test loading and retrieving historical spot prices.
+// TestGetHistoricalData tests retrieving historical bitcoin data up to the
+// current time.
+func TestGetHistoricalData(t *testing.T) {
+
+	historicalData, err := coinbase.GetHistoricalData()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(historicalData) == 0 {
+		t.Fatal("failed to retrieve historical data")
+	}
+
+}
+
+// TestGetMockSpotPrice test loading and retrieving historical spot prices to
+// mock coinbase spot price data.
 func TestGetMockSpotPrice(t *testing.T) {
 
+	mockData, err := os.Open("mock_data.csv")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// construct the coinbase mock client
-	client, err := coinbase.NewMockClient()
+	client, err := coinbase.NewMockClient(mockData)
 	if err != nil {
 		t.Fatal(err)
 	}
