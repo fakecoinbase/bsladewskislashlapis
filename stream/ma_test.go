@@ -22,7 +22,7 @@ func TestMAStream(t *testing.T) {
 	mas := stream.NewMAStream(ls, 3)
 	defer mas.Close()
 
-	// assert that expected output matches data from stream
+	// assert that expected output matches data from MA stream
 	for i, value := range expectedOuput {
 
 		streamValue, err := mas.Next()
