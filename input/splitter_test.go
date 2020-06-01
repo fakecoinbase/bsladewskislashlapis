@@ -1,8 +1,9 @@
-package stream_test
+package input_test
 
 import (
 	"testing"
 
+	"github.com/bsladewski/lapis/input"
 	"github.com/bsladewski/lapis/stream"
 	"github.com/bsladewski/lapis/util"
 )
@@ -19,10 +20,10 @@ func TestSplitterStream(t *testing.T) {
 		6.0, 6.0, 6.0, 5.0, 5.0, 5.0}
 
 	// create a list stream to provide input to the splitter stream
-	ls := stream.NewListStream(inputData)
+	ls := input.NewListStream(inputData)
 
 	// create the splitter stream
-	ss := stream.NewSplitterStream(ls, 3)
+	ss := input.NewSplitterStream(ls, 3)
 	defer ss.Close()
 
 	// assert that expected ouput matches data from splitter stream

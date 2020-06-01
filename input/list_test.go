@@ -1,8 +1,9 @@
-package stream_test
+package input_test
 
 import (
 	"testing"
 
+	"github.com/bsladewski/lapis/input"
 	"github.com/bsladewski/lapis/stream"
 )
 
@@ -13,7 +14,7 @@ func TestListStream(t *testing.T) {
 	inputData := []float64{1.0, 2.1, 3.2, 4.3, 5.4, 6.5}
 
 	// create the stream
-	ls := stream.NewListStream(inputData)
+	ls := input.NewListStream(inputData)
 	defer ls.Close()
 
 	// assert that input data matches data from stream

@@ -1,9 +1,10 @@
-package stream
+package input
 
 import (
 	"fmt"
 
 	"github.com/bsladewski/gollections"
+	"github.com/bsladewski/lapis/stream"
 )
 
 // A list represents a stream open on a pre-defined list of values.
@@ -12,7 +13,7 @@ type list struct {
 }
 
 // NewListStream returns a stream that reads values from a pre-defined list.
-func NewListStream(values []float64) Stream {
+func NewListStream(values []float64) stream.Stream {
 
 	// build linked list of values
 	valueList := gollections.NewLinkedQueue()
@@ -30,7 +31,7 @@ func (l *list) Next() (float64, error) {
 
 	// return end of stream error if the list is empty
 	if l.values.IsEmpty() {
-		return 0.0, ErrEndOfStream
+		return 0.0, stream.ErrEndOfStream
 	}
 
 	// retrieve and return the first element in the list

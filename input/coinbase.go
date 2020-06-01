@@ -1,5 +1,4 @@
-// Package coinbase provides a wrapper to the coinbase API.
-package coinbase
+package input
 
 import (
 	"encoding/csv"

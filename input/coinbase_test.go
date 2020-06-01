@@ -1,12 +1,10 @@
-// Package coinbase_test contains unit tests for interacting with the coinbase
-// API.
-package coinbase_test
+package input_test
 
 import (
 	"os"
 	"testing"
 
-	"github.com/bsladewski/lapis/coinbase"
+	"github.com/bsladewski/lapis/input"
 	"github.com/bsladewski/lapis/stream"
 )
 
@@ -14,7 +12,7 @@ import (
 func TestCoinbaseStream(t *testing.T) {
 
 	// construct the coinbase stream
-	cs := coinbase.NewCoinbaseStream()
+	cs := input.NewCoinbaseStream()
 
 	// retrieve a price
 	rate, err := cs.Next()
@@ -43,7 +41,7 @@ func TestGetMockSpotPrice(t *testing.T) {
 	}
 
 	// construct the coinbase mock stream
-	ms, err := coinbase.NewCoinbaseMockStream(mockData)
+	ms, err := input.NewCoinbaseMockStream(mockData)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +76,7 @@ func TestGetMockSpotPrice(t *testing.T) {
 // current time.
 func TestGetHistoricalData(t *testing.T) {
 
-	historicalData, err := coinbase.GetHistoricalData()
+	historicalData, err := input.GetHistoricalData()
 	if err != nil {
 		t.Fatal(err)
 	}

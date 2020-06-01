@@ -1,8 +1,10 @@
-package stream_test
+package indicator_test
 
 import (
 	"testing"
 
+	"github.com/bsladewski/lapis/indicator"
+	"github.com/bsladewski/lapis/input"
 	"github.com/bsladewski/lapis/stream"
 	"github.com/bsladewski/lapis/util"
 )
@@ -17,10 +19,10 @@ func TestMAStream(t *testing.T) {
 	expectedOuput := []float64{3.0, 3.5, 3.0, 4.0, 4.0, 5.0, 3.0, 2.0}
 
 	// create a list stream to provide input to the MA stream
-	ls := stream.NewListStream(inputData)
+	ls := input.NewListStream(inputData)
 
 	// create the MA stream
-	mas := stream.NewMAStream(ls, 3)
+	mas := indicator.NewMAStream(ls, 3)
 	defer mas.Close()
 
 	// assert that expected output matches data from MA stream
@@ -57,10 +59,10 @@ func TestMAOscillatorStream(t *testing.T) {
 	expectedOuput := []float64{0.0, 0.0, 0.0, 0.25, 1.0, 0.25, -1.25, -2.0}
 
 	// create a list stream to provide input to the MA oscillator stream
-	ls := stream.NewListStream(inputData)
+	ls := input.NewListStream(inputData)
 
 	// create the MA oscillator stream
-	mas := stream.NewMAOscillatorStream(ls, 2, 4)
+	mas := indicator.NewMAOscillatorStream(ls, 2, 4)
 	defer mas.Close()
 
 	// assert that expected output matches data from MA stream

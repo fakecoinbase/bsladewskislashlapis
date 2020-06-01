@@ -1,4 +1,6 @@
-package stream
+package input
+
+import "github.com/bsladewski/lapis/stream"
 
 // splitter is the concrete implementation of a stream that splits an input by
 // allowing it to be read a specified number of times before advancing to the
@@ -7,17 +9,17 @@ type splitter struct {
 	n     int
 	m     int
 	value float64
-	input Stream
+	in    stream.Stream
 	err   error
 }
 
 // NewSplitterStream returns a stream that can be used to split an input stream
 // amonst multiple output streams by repeating each item in the stream n times.
-func NewSplitterStream(input Stream, n int) Stream {
+func NewSplitterStream(in stream.Stream, n int) stream.Stream {
 
 	return &splitter{
-		input: input,
-		n:     n,
+		in: in,
+		n:  n,
 	}
 
 }
@@ -26,7 +28,7 @@ func (s *splitter) Next() (float64, error) {
 
 	// if we have consumed the current input n times, read the next value
 	if s.m <= 0 {
-		s.value, s.err = s.input.Next()
+		s.value, s.err = s.in.Next()
 		s.m = s.n
 	}
 
@@ -45,5 +47,5 @@ func (s *splitter) Next() (float64, error) {
 }
 
 func (s *splitter) Close() {
-	s.input.Close()
+	s.in.Close()
 }

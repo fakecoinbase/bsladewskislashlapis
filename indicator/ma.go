@@ -1,10 +1,13 @@
-package stream
+package indicator
 
 import (
 	"errors"
 	"fmt"
 
 	"github.com/bsladewski/gollections"
+	"github.com/bsladewski/lapis/input"
+	"github.com/bsladewski/lapis/math"
+	"github.com/bsladewski/lapis/stream"
 )
 
 // ma is the concrete implementation of a stream that applies a Moving Average
@@ -12,17 +15,17 @@ import (
 type ma struct {
 	period int
 	frame  gollections.Queue
-	input  Stream
+	in     stream.Stream
 }
 
 // NewMAStream returns a stream that applies a Moving Average function to input
 // data.
-func NewMAStream(input Stream, period int) Stream {
+func NewMAStream(in stream.Stream, period int) stream.Stream {
 
 	return &ma{
 		period: period,
 		frame:  gollections.NewLinkedQueue(),
-		input:  input,
+		in:     in,
 	}
 
 }
@@ -34,7 +37,7 @@ func (m *ma) Next() (float64, error) {
 	}
 
 	// retrieve the next piece of input data
-	next, err := m.input.Next()
+	next, err := m.in.Next()
 	if err != nil {
 		return 0.0, err
 	}
@@ -63,16 +66,17 @@ func (m *ma) Next() (float64, error) {
 }
 
 func (m *ma) Close() {
-	m.input.Close()
+	m.in.Close()
 }
 
 // NewMAOscillatorStream returns a stream that applies a Moving Average
 // oscillator function to input data.
-func NewMAOscillatorStream(input Stream, fastPeriod, slowPeriod int) Stream {
+func NewMAOscillatorStream(in stream.Stream, fastPeriod,
+	slowPeriod int) stream.Stream {
 
-	splitter := NewSplitterStream(input, 2)
+	splitter := input.NewSplitterStream(in, 2)
 
-	return NewSubStream(
+	return math.NewSubStream(
 		NewMAStream(splitter, fastPeriod),
 		NewMAStream(splitter, slowPeriod),
 	)

@@ -1,6 +1,7 @@
-package stream
+package math
 
 import (
+	"github.com/bsladewski/lapis/stream"
 	"github.com/bsladewski/lapis/util"
 	"github.com/pkg/errors"
 )
@@ -9,11 +10,11 @@ import (
 // of a number of input streams; if any input stream reaches the end of input,
 // an add stream will output an end of stream error.
 type add struct {
-	inputs []Stream
+	inputs []stream.Stream
 }
 
 // NewAddStream returns a stream that adds the output of multiple input streams.
-func NewAddStream(inputs ...Stream) Stream {
+func NewAddStream(inputs ...stream.Stream) stream.Stream {
 
 	return &add{
 		inputs: inputs,
@@ -43,8 +44,8 @@ func (a *add) Next() (float64, error) {
 
 	// if we are at the end of any stream, return an end of stream error
 	for _, err := range errs {
-		for errors.Cause(err) == ErrEndOfStream {
-			return 0.0, ErrEndOfStream
+		for errors.Cause(err) == stream.ErrEndOfStream {
+			return 0.0, stream.ErrEndOfStream
 		}
 	}
 
@@ -61,8 +62,8 @@ func (a *add) Next() (float64, error) {
 func (a *add) Close() {
 
 	// close all input streams
-	for _, input := range a.inputs {
-		input.Close()
+	for _, in := range a.inputs {
+		in.Close()
 	}
 
 }

@@ -1,8 +1,10 @@
-package stream_test
+package math_test
 
 import (
 	"testing"
 
+	"github.com/bsladewski/lapis/input"
+	"github.com/bsladewski/lapis/math"
 	"github.com/bsladewski/lapis/stream"
 	"github.com/bsladewski/lapis/util"
 )
@@ -21,13 +23,13 @@ func TestAddStream(t *testing.T) {
 	expectedOutput := []float64{13.6, 6.3, 13.8, 3.5}
 
 	// create a list stream for input A
-	lsA := stream.NewListStream(inputDataA)
+	lsA := input.NewListStream(inputDataA)
 
 	// create a list stream for input B
-	lsB := stream.NewListStream(inputDataB)
+	lsB := input.NewListStream(inputDataB)
 
 	// create the add stream
-	as := stream.NewAddStream(lsA, lsB)
+	as := math.NewAddStream(lsA, lsB)
 	defer as.Close()
 
 	// assert that expected ouput matches data from add stream
