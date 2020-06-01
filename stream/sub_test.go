@@ -28,6 +28,7 @@ func TestSubStream(t *testing.T) {
 
 	// create the sub stream
 	as := stream.NewSubStream(lsA, lsB)
+	defer as.Close()
 
 	// assert that expected ouput matches data from sub stream
 	for i, value := range expectedOutput {

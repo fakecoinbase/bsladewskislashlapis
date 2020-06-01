@@ -65,3 +65,16 @@ func (m *ma) Next() (float64, error) {
 func (m *ma) Close() {
 	m.input.Close()
 }
+
+// NewMAOscillatorStream returns a stream that applies a Moving Average
+// oscillator function to input data.
+func NewMAOscillatorStream(input Stream, fastPeriod, slowPeriod int) Stream {
+
+	splitter := NewSplitterStream(input, 2)
+
+	return NewSubStream(
+		NewMAStream(splitter, fastPeriod),
+		NewMAStream(splitter, slowPeriod),
+	)
+
+}

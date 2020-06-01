@@ -28,6 +28,7 @@ func TestAddStream(t *testing.T) {
 
 	// create the add stream
 	as := stream.NewAddStream(lsA, lsB)
+	defer as.Close()
 
 	// assert that expected ouput matches data from add stream
 	for i, value := range expectedOutput {
