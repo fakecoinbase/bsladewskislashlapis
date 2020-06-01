@@ -15,30 +15,30 @@ import (
 	"github.com/bsladewski/lapis/stream"
 )
 
-// A defaultClient is used to interact with the coinbase API.
-type defaultClient struct {
+// A coinbaseStream is used to interact with the coinbase API.
+type coinbaseStream struct {
 	client http.Client
 }
 
-// NewClient retrieves a client that can be used to interact with the coinbase
-// API.
-func NewClient() stream.Stream {
+// NewCoinbaseStream retrieves a stream that can be used to retrieve values from
+// the coinbase API.
+func NewCoinbaseStream() stream.Stream {
 
-	return &defaultClient{
+	return &coinbaseStream{
 		client: http.Client{Timeout: 15 * time.Second},
 	}
 
 }
 
-// A mockClient mocks interactions with the coinbase API.
-type mockClient struct {
+// A coinbaseMockStream mocks interactions with the coinbase API.
+type coinbaseMockStream struct {
 	index      int
 	spotPrices []float64
 }
 
-// NewMockClient retrieves a client that can be used to mock interactions with
-// the coinbaes API.
-func NewMockClient(mockDataReader io.Reader) (stream.Stream, error) {
+// NewCoinbaseMockStream retrieves a client that can be used to mock
+// interactions with the coinbaes API.
+func NewCoinbaseMockStream(mockDataReader io.Reader) (stream.Stream, error) {
 
 	spotPrices, err := parseHistoricalData(mockDataReader)
 	if err != nil {
@@ -46,7 +46,7 @@ func NewMockClient(mockDataReader io.Reader) (stream.Stream, error) {
 	}
 
 	// return the mock client starting at index zero of historical price data
-	return &mockClient{
+	return &coinbaseMockStream{
 		index:      0,
 		spotPrices: spotPrices,
 	}, nil
@@ -59,7 +59,7 @@ type spotPriceResponse struct {
 	Amount string `json:"amount"`
 }
 
-func (d *defaultClient) Next() (float64, error) {
+func (d *coinbaseStream) Next() (float64, error) {
 
 	// create a new GET request to coinbase spot price endpoint
 	req, err := http.NewRequest(
@@ -108,9 +108,9 @@ func (d *defaultClient) Next() (float64, error) {
 
 }
 
-func (d *defaultClient) Close() {}
+func (d *coinbaseStream) Close() {}
 
-func (m *mockClient) Next() (float64, error) {
+func (m *coinbaseMockStream) Next() (float64, error) {
 
 	// retrieve the next item of mock data and increment current index into mock
 	// data
@@ -125,7 +125,7 @@ func (m *mockClient) Next() (float64, error) {
 
 }
 
-func (m *mockClient) Close() {
+func (m *coinbaseMockStream) Close() {
 	m.spotPrices = nil
 }
 
