@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bsladewski/lapis/stream"
+	"github.com/bsladewski/lapis/util"
 )
 
 // TestMAStream tests calculations performed by a Moving Average stream.
@@ -30,7 +31,9 @@ func TestMAStream(t *testing.T) {
 			t.Fatalf("index %d; err: %v", i, err)
 		}
 
-		if streamValue != value {
+		t.Logf("expected: %v, got: %v", value, streamValue)
+
+		if util.CompareFloat(streamValue, value) != 0 {
 			t.Fatalf("index %d; expected %.2f, got %.2f", i, value, streamValue)
 		}
 

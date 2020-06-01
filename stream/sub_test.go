@@ -7,9 +7,9 @@ import (
 	"github.com/bsladewski/lapis/util"
 )
 
-// TestAddStream tests adding the result of multiple input streams using an add
-// stream.
-func TestAddStream(t *testing.T) {
+// TestSubStream tests subtracting the result of multiple input streams using an
+// sub stream.
+func TestSubStream(t *testing.T) {
 
 	// define input data for stream A
 	inputDataA := []float64{4.5, 3.9, 8.6, 1.2, 4.4}
@@ -17,8 +17,8 @@ func TestAddStream(t *testing.T) {
 	// define input data for stream B
 	inputDataB := []float64{9.1, 2.4, 5.2, 2.3}
 
-	// define expected output as sum of streams A and B
-	expectedOutput := []float64{13.6, 6.3, 13.8, 3.5}
+	// define expected output as result of subractin stream A from B
+	expectedOutput := []float64{-4.6, 1.5, 3.4, -1.1}
 
 	// create a list stream for input A
 	lsA := stream.NewListStream(inputDataA)
@@ -26,10 +26,10 @@ func TestAddStream(t *testing.T) {
 	// create a list stream for input B
 	lsB := stream.NewListStream(inputDataB)
 
-	// create the add stream
-	as := stream.NewAddStream(lsA, lsB)
+	// create the sub stream
+	as := stream.NewSubStream(lsA, lsB)
 
-	// assert that expected ouput matches data from add stream
+	// assert that expected ouput matches data from sub stream
 	for i, value := range expectedOutput {
 
 		streamValue, err := as.Next()

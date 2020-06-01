@@ -26,8 +26,8 @@ func (a *add) Next() (float64, error) {
 	// errors returned by input streams
 	var errs []error
 
-	// the sum of the input stream ouputs
-	var sum float64
+	// the result of adding the input stream ouputs
+	var result float64
 
 	// retrieve next value from all input streams, this should consume from
 	// each input stream on every call to Next regardless of errors returned
@@ -37,7 +37,7 @@ func (a *add) Next() (float64, error) {
 		if err != nil {
 			errs = append(errs, err)
 		} else {
-			sum += value
+			result += value
 		}
 	}
 
@@ -54,7 +54,7 @@ func (a *add) Next() (float64, error) {
 	}
 
 	// return the result of the addition
-	return sum, nil
+	return result, nil
 
 }
 
