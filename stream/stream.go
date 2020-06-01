@@ -1,3 +1,5 @@
+// Package stream defines the fundamental stream interface used to process data
+// within the lapis system.
 package stream
 
 import "errors"
